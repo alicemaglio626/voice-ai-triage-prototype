@@ -19,7 +19,14 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { AlertTriangle, CheckCircle, Volume2, X } from "lucide-react";
 import { TRIAGE_MOCK } from "../mock-data";
 import { deriveTheme, deriveWhoEnded, workItemTypeBadgeVariant } from "../bucketing";
-import { callTypeFor, mockTranscript, mockMachineOpinions } from "../detail-mock";
+import {
+  callTypeFor,
+  mockTranscript,
+  mockMachineOpinions,
+  reasonFor,
+  reasonBadgeClass,
+  opsCaptureFor,
+} from "../detail-mock";
 import { AddWorkItemDialog, type LinkedWorkItem } from "../add-work-item-dialog";
 
 const DISPOSITIONS = [
@@ -29,7 +36,7 @@ const DISPOSITIONS = [
   "Member Not Verified",
   "Provider Requested Payment",
   "Human Hung Up",
-  "Working as intended (non-success)",
+  "No Answer",
 ];
 
 export default function CallDetailPage() {
@@ -60,6 +67,8 @@ export default function CallDetailPage() {
   const { theme } = deriveTheme(item.note);
   const whoEnded = deriveWhoEnded(item.note);
   const callType = callTypeFor(item.call_id);
+  const reason = reasonFor(item.call_id);
+  const { aiMistake, frustrated } = opsCaptureFor(item.call_id);
   const transcript = mockTranscript(item.note, theme, whoEnded);
   const opinions = mockMachineOpinions(theme);
 
@@ -71,11 +80,6 @@ export default function CallDetailPage() {
           { label: `Call ${item.call_id}` },
         ]}
       />
-      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <Badge variant="outline">{callType}</Badge>
-        <span>{item.created_date}</span>
-        <span>· ended by {whoEnded}</span>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* LEFT — recording + transcript */}
@@ -136,21 +140,56 @@ export default function CallDetailPage() {
         {/* RIGHT — escalation, machine opinions, work items */}
         <div className="flex flex-col gap-4">
           <Card>
-            <CardHeader className="gap-2">
+            <CardHeader className="gap-0">
               <div className="flex items-center gap-2">
-                <Badge variant="outline">Escalation</Badge>
-                <span className="text-sm text-muted-foreground">
-                  {callType}
-                </span>
+                <Badge variant="outline" className={reasonBadgeClass(reason)}>
+                  {reason}
+                </Badge>
+                <span className="text-sm text-muted-foreground">{callType}</span>
               </div>
-              <CardTitle>Escalated for R&amp;D review</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="mb-2 text-sm font-medium">
-                This call was escalated by the reviewer.
-              </p>
-              <div className="rounded-md border p-3 text-sm text-muted-foreground">
-                {item.note}
+            <CardContent className="space-y-3 text-sm">
+              {reason === "Ops Escalation" ? (
+                <>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-muted-foreground">
+                      Jessica made a mistake
+                    </div>
+                    {aiMistake ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="warning">Yes</Badge>
+                        <span>{aiMistake}</span>
+                      </div>
+                    ) : (
+                      <Badge variant="outline">No</Badge>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-muted-foreground">
+                      Provider got frustrated
+                    </div>
+                    {frustrated ? (
+                      <Badge variant={frustrated === "Yes" ? "warning" : "outline"}>
+                        {frustrated}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">Not captured</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  The system couldn&rsquo;t confidently identify the outcome for
+                  this call.
+                </p>
+              )}
+              <div className="space-y-1">
+                <div className="text-xs font-medium text-muted-foreground">
+                  {reason === "Ops Escalation" ? "Reviewer note" : "Details"}
+                </div>
+                <div className="rounded-md border p-3 text-muted-foreground">
+                  {item.note}
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -55,6 +55,7 @@ const AI_MISTAKES = [
   "Talked over staff",
   "Dead air / long silence",
   "Ended the call too early",
+  "Something else",
 ] as const;
 
 const TRANSCRIPT = [
