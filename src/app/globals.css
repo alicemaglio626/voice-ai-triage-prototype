@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-dm-sans);
+  --font-mono: var(--font-dm-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-datavant-teal: #14e7e8;
+  --color-datavant-teal-light: #d6ffff;
+  --color-datavant-teal-medium: #46c4c3;
+  --color-datavant-teal-dark: #0f3d4c;
+  --color-datavant-violet: #7c8cef;
+  --color-datavant-violet-light: #d6d6ff;
+  --color-datavant-violet-medium: #475ff2;
+  --color-datavant-violet-dark: #152271;
+  --color-datavant-sandstone: #eceae4;
+  --color-datavant-obsidian: #020202;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #020202;
+  --card: #ffffff;
+  --card-foreground: #020202;
+  --popover: #ffffff;
+  --popover-foreground: #020202;
+  --primary: #020202;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eee9;
+  --secondary-foreground: #020202;
+  --muted: #eceae4;
+  --muted-foreground: #676767;
+  --accent: #f0eee9;
+  --accent-foreground: #020202;
+  --destructive: #ef4444;
+  --border: #e6e6e6;
+  --input: #e6e6e6;
+  --ring: #14e7e8;
+  --chart-1: #14e7e8;
+  --chart-2: #7c8cef;
+  --chart-3: #46c4c3;
+  --chart-4: #475ff2;
+  --chart-5: #0f3d4c;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #020202;
+  --sidebar-primary: #020202;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0eee9;
+  --sidebar-accent-foreground: #020202;
+  --sidebar-border: #eceae4;
+  --sidebar-ring: #14e7e8;
+}
+
+.dark {
+  --background: #020202;
+  --foreground: #ffffff;
+  --card: #1b1b1b;
+  --card-foreground: #ffffff;
+  --popover: #1b1b1b;
+  --popover-foreground: #ffffff;
+  --primary: #14e7e8;
+  --primary-foreground: #020202;
+  --secondary: #282828;
+  --secondary-foreground: #e6e6e6;
+  --muted: #353535;
+  --muted-foreground: #9a9a9a;
+  --accent: #282828;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #353535;
+  --input: #353535;
+  --ring: #14e7e8;
+  --chart-1: #14e7e8;
+  --chart-2: #7c8cef;
+  --chart-3: #46c4c3;
+  --chart-4: #475ff2;
+  --chart-5: #0f3d4c;
+  --sidebar: #1b1b1b;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #14e7e8;
+  --sidebar-primary-foreground: #020202;
+  --sidebar-accent: #282828;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #353535;
+  --sidebar-ring: #14e7e8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    @apply bg-background text-foreground;
+  }
+  body {
+    @apply overflow-hidden;
+  }
+}
