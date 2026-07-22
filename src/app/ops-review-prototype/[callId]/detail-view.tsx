@@ -75,7 +75,13 @@ export default function OpsReviewCallPage() {
   const isNoneOfThese = outcome === "None of these / I'm not sure";
   const goesToTriage = isNoneOfThese;
   // On the triage path, the two Yes/No axes are required before submit.
-  const captureComplete = !goesToTriage || (!!aiMessedUp && !!frustrated);
+  // On the triage path both Yes/No axes are required, and when Jessica made a
+  // mistake the reviewer must say what went wrong (PM: required, not optional).
+  const captureComplete =
+    !goesToTriage ||
+    (!!aiMessedUp &&
+      !!frustrated &&
+      (aiMessedUp === "No" || mistakes.length > 0));
 
   const submit = () => {
     if (!outcome || !captureComplete) return;
@@ -262,21 +268,26 @@ export default function OpsReviewCallPage() {
                       ))}
                     </div>
                     {aiMessedUp === "Yes" && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="mt-2 w-full justify-between font-normal"
-                          >
-                            <span
-                              className={
-                                mistakes.length ? "" : "text-muted-foreground"
-                              }
+                      <div className="mt-2 space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">
+                          What went wrong
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between font-normal"
                             >
-                              {mistakes.length
-                                ? `${mistakes.length} selected`
-                                : "What happened? (optional)"}
-                            </span>
+                              <span
+                                className={
+                                  mistakes.length ? "" : "text-muted-foreground"
+                                }
+                              >
+                                {mistakes.length
+                                  ? `${mistakes.length} selected`
+                                  : "Select what went wrong"}
+                              </span>
                             <ChevronDown className="h-4 w-4 opacity-50" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -299,7 +310,8 @@ export default function OpsReviewCallPage() {
                             </DropdownMenuCheckboxItem>
                           ))}
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                        </DropdownMenu>
+                      </div>
                     )}
                   </div>
 
