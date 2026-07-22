@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[39756,["/voice-ai-triage-prototype/_next/static/chunks/2q8jjadh43l1j.js","/voice-ai-triage-prototype/_next/static/chunks/1e2ai_wi0mlzp.js","/voice-ai-triage-prototype/_next/static/chunks/14mrh2-p_w84d.js","/voice-ai-triage-prototype/_next/static/chunks/12ol3n-edn9ov.js","/voice-ai-triage-prototype/_next/static/chunks/0z01wi93nv-qx.js"],"default"]
+3:I[37457,["/voice-ai-triage-prototype/_next/static/chunks/2q8jjadh43l1j.js","/voice-ai-triage-prototype/_next/static/chunks/1e2ai_wi0mlzp.js","/voice-ai-triage-prototype/_next/static/chunks/14mrh2-p_w84d.js","/voice-ai-triage-prototype/_next/static/chunks/12ol3n-edn9ov.js","/voice-ai-triage-prototype/_next/static/chunks/0z01wi93nv-qx.js"],"default"]
+4:[]
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"sTS22LGqz5OIjFsQpXY8y"}
