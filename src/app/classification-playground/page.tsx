@@ -59,7 +59,7 @@ export default function ClassificationPlaygroundPage() {
             </div>
             <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
               Classifiers disagree — this run would be sent to triage as a{" "}
-              <span className="font-medium">System Escalation</span>.
+              <span className="font-medium">System Disagreement</span>.
             </div>
             <div className="space-y-1.5 rounded-md bg-muted/40 p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
