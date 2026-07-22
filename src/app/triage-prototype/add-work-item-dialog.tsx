@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   suggestWorkItem,
   workItemTypeBadgeVariant,
@@ -158,7 +158,6 @@ export function AddWorkItemDialog({
             {s.existing && (
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
                   Suggested for this call
                 </div>
                 <label className="flex cursor-pointer items-center gap-2.5 rounded-md border border-primary/50 bg-primary/5 p-2.5 hover:bg-primary/10">
@@ -177,7 +176,7 @@ export function AddWorkItemDialog({
             {/* Everything else — multi-select */}
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">
-                {hasSuggested ? "Other open work items" : "All open work items"}
+                Open work items
               </Label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
