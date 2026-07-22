@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+import { LayoutWrapper } from "@/components/layout/layout-wrapper";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -30,7 +31,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${dmMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
+          <LayoutWrapper>{children}</LayoutWrapper>
           <Toaster />
         </ThemeProvider>
       </body>
