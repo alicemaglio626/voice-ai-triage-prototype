@@ -110,7 +110,7 @@ export default function OpsReviewCallPage() {
         <PageHeader
           title="Review this call"
           breadcrumbs={[
-            { label: "Ops Review (prototype)", href: LIST },
+            { label: "Ops Review", href: LIST },
             { label: "Review this call" },
           ]}
           actions={

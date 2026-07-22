@@ -81,7 +81,7 @@ export default function TriagePrototypePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        breadcrumbs={[{ label: "Triage (prototype)" }]}
+        breadcrumbs={[{ label: "Triage" }]}
         actions={
           <Badge variant="warning" className="gap-1">
             <FlaskConical className="h-3 w-3" />

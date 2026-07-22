@@ -76,7 +76,7 @@ export default function CallDetailPage() {
     <div className="space-y-4">
       <PageHeader
         breadcrumbs={[
-          { label: "Triage (prototype)", href: "/triage-prototype" },
+          { label: "Triage", href: "/triage-prototype" },
           { label: `Call ${item.call_id}` },
         ]}
       />

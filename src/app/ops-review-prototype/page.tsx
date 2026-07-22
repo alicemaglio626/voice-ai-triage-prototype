@@ -59,7 +59,7 @@ export default function OpsReviewQueuePage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        breadcrumbs={[{ label: "Ops Review (prototype)" }]}
+        breadcrumbs={[{ label: "Ops Review" }]}
         actions={
           <Badge variant="warning" className="gap-1">
             <FlaskConical className="h-3 w-3" />

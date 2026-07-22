@@ -47,8 +47,8 @@ const BASE =
 
 // Static stand-in counts so the queue badges look real in the prototype.
 const MOCK_BADGES: Record<string, number> = {
-  "/calls/review": 12,
-  "/rnd/triage": 47,
+  "/ops-review-prototype": 12,
+  "/triage-prototype": 47,
 };
 
 interface NavItem {
@@ -62,8 +62,7 @@ const navSections: { label: string; items: NavItem[] }[] = [
     label: "Calls",
     items: [
       { href: "/calls/explorer", label: "Call explorer", icon: Search },
-      { href: "/calls/review", label: "Ops Review", icon: Eye },
-      { href: "/ops-review-prototype", label: "Ops Review (prototype)", icon: FlaskConical },
+      { href: "/ops-review-prototype", label: "Ops Review", icon: Eye },
       { href: "/batches", label: "Batches", icon: Play },
       { href: "/test-call", label: "Test calls", icon: Phone },
     ],
@@ -88,8 +87,7 @@ const navSections: { label: string; items: NavItem[] }[] = [
     label: "R&D",
     items: [
       { href: "/rnd/analysis", label: "Analysis", icon: BarChart3 },
-      { href: "/rnd/triage", label: "Triage", icon: AlertTriangle },
-      { href: "/triage-prototype", label: "Triage (prototype)", icon: FlaskConical },
+      { href: "/triage-prototype", label: "Triage", icon: AlertTriangle },
       { href: "/rnd/work-items", label: "Work items", icon: ClipboardList },
     ],
   },
