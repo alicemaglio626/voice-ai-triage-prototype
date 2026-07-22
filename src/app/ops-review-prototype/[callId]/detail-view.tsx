@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -71,10 +71,10 @@ export default function OpsReviewCallPage() {
   const [mistakes, setMistakes] = useState<string[]>([]);
   const [frustrated, setFrustrated] = useState<"Yes" | "No" | null>(null);
   const [note, setNote] = useState("");
+  const followUpRef = useRef<HTMLDivElement>(null);
 
   const isNoneOfThese = outcome === "None of these / I'm not sure";
   const goesToTriage = isNoneOfThese;
-  // On the triage path, the two Yes/No axes are required before submit.
   // On the triage path both Yes/No axes are required, and when Jessica made a
   // mistake the reviewer must say what went wrong (PM: required, not optional).
   const captureComplete =
@@ -82,6 +82,17 @@ export default function OpsReviewCallPage() {
     (!!aiMessedUp &&
       !!frustrated &&
       (aiMessedUp === "No" || mistakes.length > 0));
+
+  // The outcome list is long — when the call heads to triage, scroll the
+  // follow-up form into view so it's obvious the reviewer has more to fill in.
+  useEffect(() => {
+    if (goesToTriage) {
+      followUpRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [goesToTriage]);
 
   const submit = () => {
     if (!outcome || !captureComplete) return;
@@ -184,67 +195,66 @@ export default function OpsReviewCallPage() {
           </Card>
         </div>
 
-        {/* RIGHT — the review (sits on a subtle panel, black left accent) */}
-        <div className="lg:sticky lg:top-4 lg:self-start">
-          <div className="rounded-xl bg-muted/40 p-3">
-            <Card className="flex max-h-[calc(100vh-9rem)] flex-col gap-0 overflow-hidden border-l-4 border-l-foreground py-0">
-              <CardHeader className="shrink-0 pt-6 pb-4">
-                <CardTitle className="text-base">
-                  What happened on this call?
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Choose the one answer that best fits. If anything you pick
-                  needs extra details, a short form will appear below it.
-                </p>
-              </CardHeader>
-              {/* Scrollable list — scrolls behind the pinned footer below */}
-              <div className="flex-1 space-y-5 overflow-y-auto px-6 pb-4">
-                {/* Outcome — radio list with explanations */}
-              <div className="space-y-2">
-                <Label>
-                  Outcome<span className="text-destructive">*</span>
-                </Label>
-                <div className="space-y-1.5">
-                  {OUTCOMES.map((o) => {
-                    const active = outcome === o.label;
-                    return (
-                      <button
-                        key={o.label}
-                        onClick={() => setOutcome(o.label)}
+        {/* RIGHT — grey panel: fixed "What happened" card on top; the radio list
+            scrolls over the grey background, behind that card and the button card.
+            No black border anywhere. */}
+        <div className="flex max-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-xl bg-muted/50 lg:sticky lg:top-4 lg:self-start">
+          {/* One white card (header + scrolling radio list) sitting on the grey panel */}
+          <Card className="m-3 flex min-h-0 flex-1 flex-col gap-0 overflow-hidden py-0">
+            <CardHeader className="shrink-0 px-6 pt-6 pb-4">
+              <CardTitle className="text-base">
+                What happened on this call?
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Choose the one answer that best fits. If anything you pick needs
+                extra details, a short form will appear below it.
+              </p>
+            </CardHeader>
+            {/* Radio list scrolls inside the white card, behind the fixed header */}
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 pb-4">
+              <div className="space-y-1.5">
+                {OUTCOMES.map((o) => {
+                  const active = outcome === o.label;
+                  return (
+                    <button
+                      key={o.label}
+                      onClick={() => setOutcome(o.label)}
+                      className={cn(
+                        "flex w-full items-start gap-2.5 rounded-md border bg-card p-2.5 text-left transition-colors",
+                        active
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:bg-muted/40",
+                      )}
+                    >
+                      <span
                         className={cn(
-                          "flex w-full items-start gap-2.5 rounded-md border p-2.5 text-left transition-colors",
-                          active
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:bg-muted/40",
+                          "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+                          active ? "border-primary" : "border-muted-foreground/40",
                         )}
                       >
-                        <span
-                          className={cn(
-                            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
-                            active ? "border-primary" : "border-muted-foreground/40",
-                          )}
-                        >
-                          {active && (
-                            <span className="h-2 w-2 rounded-full bg-primary" />
-                          )}
+                        {active && (
+                          <span className="h-2 w-2 rounded-full bg-primary" />
+                        )}
+                      </span>
+                      <span>
+                        <span className="block text-sm font-medium">
+                          {o.label}
                         </span>
-                        <span>
-                          <span className="block text-sm font-medium">
-                            {o.label}
-                          </span>
-                          <span className="block text-xs text-muted-foreground">
-                            {o.desc}
-                          </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {o.desc}
                         </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Lightweight capture — only when the call is heading to triage */}
               {goesToTriage && (
-                <div className="space-y-3 rounded-md p-3 ring-2 ring-[#7c8cef]/60">
+                <div
+                  ref={followUpRef}
+                  className="scroll-mt-4 space-y-3 rounded-md border bg-card p-3"
+                >
                   <div className="text-sm font-medium">Follow-up details</div>
 
                   <div className="space-y-1.5">
@@ -270,7 +280,7 @@ export default function OpsReviewCallPage() {
                     {aiMessedUp === "Yes" && (
                       <div className="mt-2 space-y-1.5">
                         <Label className="text-xs text-muted-foreground">
-                          What went wrong
+                          What went wrong?
                           <span className="text-destructive">*</span>
                         </Label>
                         <DropdownMenu>
@@ -355,27 +365,35 @@ export default function OpsReviewCallPage() {
                 </div>
               )}
 
-              </div>
+            </div>
+          </Card>
 
-              {/* Pinned footer — the list scrolls behind this */}
-              <div className="shrink-0 space-y-2 border-t bg-card px-6 py-4">
-                <Button
-                  className="w-full"
-                  disabled={!outcome || !captureComplete}
-                  onClick={submit}
-                >
-                  Submit
-                </Button>
-                <Button variant="outline" className="w-full" onClick={cancel}>
-                  Cancel
-                </Button>
-                <p className="pt-1 text-center text-xs text-muted-foreground">
-                  Keyboard shortcuts: 1–9 pick an outcome · Enter submits · Esc
-                  cancels
-                </p>
-              </div>
-            </Card>
-          </div>
+          {/* Button card — spans the entire width of the grey panel */}
+          <Card className="shrink-0 gap-0 rounded-none border-x-0 border-b-0 py-4">
+            <CardContent className="space-y-2 px-6">
+              <Button
+                className="w-full"
+                disabled={!outcome || !captureComplete}
+                onClick={submit}
+              >
+                Submit
+              </Button>
+              <Button variant="outline" className="w-full" onClick={cancel}>
+                Cancel
+              </Button>
+              <p className="pt-1 text-center text-xs text-muted-foreground">
+                Shortcuts:{" "}
+                <kbd className="rounded border bg-background px-1 font-mono text-[10px]">
+                  Ctrl+Enter
+                </kbd>{" "}
+                to submit &amp; go to the next call ·{" "}
+                <kbd className="rounded border bg-background px-1 font-mono text-[10px]">
+                  Esc
+                </kbd>{" "}
+                to stop reviewing
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
