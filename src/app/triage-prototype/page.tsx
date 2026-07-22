@@ -38,7 +38,6 @@ import {
   ArrowDown,
   ArrowUp,
   CalendarIcon,
-  FlaskConical,
   Search,
   X,
 } from "lucide-react";
@@ -80,15 +79,7 @@ interface Row {
 export default function TriagePrototypePage() {
   return (
     <div className="space-y-4">
-      <PageHeader
-        breadcrumbs={[{ label: "Triage" }]}
-        actions={
-          <Badge variant="warning" className="gap-1">
-            <FlaskConical className="h-3 w-3" />
-            Prototype
-          </Badge>
-        }
-      />
+      <PageHeader breadcrumbs={[{ label: "Triage" }]} />
       <TriageTab />
     </div>
   );

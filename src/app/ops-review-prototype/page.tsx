@@ -23,7 +23,7 @@ import {
 import { Pagination } from "@/components/ui/pagination";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
-import { CheckCircle, Filter, FlaskConical, Phone, Search } from "lucide-react";
+import { CheckCircle, Filter, Phone, Search } from "lucide-react";
 import { OPS_QUEUE, CALL_TYPES } from "./queue-mock";
 
 export default function OpsReviewQueuePage() {
@@ -58,15 +58,7 @@ export default function OpsReviewQueuePage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        breadcrumbs={[{ label: "Ops Review" }]}
-        actions={
-          <Badge variant="warning" className="gap-1">
-            <FlaskConical className="h-3 w-3" />
-            Prototype
-          </Badge>
-        }
-      />
+      <PageHeader breadcrumbs={[{ label: "Ops Review" }]} />
 
       {/* Banner — matches prod's live-calls banner */}
       <div className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,19 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/shared/page-header";
 import { CopyIdButton } from "@/components/shared/copy-id-button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  ArrowLeft,
-  ChevronDown,
-  FlaskConical,
-  Keyboard,
-  Volume2,
-} from "lucide-react";
+import { ArrowLeft, ChevronDown, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { queueRowFor } from "../queue-mock";
 
@@ -45,7 +32,10 @@ const OUTCOMES: { label: string; desc: string }[] = [
   { label: "Provider Requested Payment", desc: "Office wants payment before releasing records." },
   { label: "Human Hung Up", desc: "A person ended the call." },
   { label: "No Answer", desc: "No one picked up; no voicemail left." },
-  { label: "None of these", desc: "Doesn't fit an outcome — sends to triage." },
+  {
+    label: "None of these / I'm not sure",
+    desc: "Pick this if there isn't enough on this call for you to be sure.",
+  },
 ];
 
 const AI_MISTAKES = [
@@ -82,7 +72,7 @@ export default function OpsReviewCallPage() {
   const [frustrated, setFrustrated] = useState<"Yes" | "No" | null>(null);
   const [note, setNote] = useState("");
 
-  const isNoneOfThese = outcome === "None of these";
+  const isNoneOfThese = outcome === "None of these / I'm not sure";
   const goesToTriage = isNoneOfThese;
   // On the triage path, the two Yes/No axes are required before submit.
   const captureComplete = !goesToTriage || (!!aiMessedUp && !!frustrated);
@@ -113,24 +103,6 @@ export default function OpsReviewCallPage() {
             { label: "Ops Review", href: LIST },
             { label: "Review this call" },
           ]}
-          actions={
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Keyboard className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Keyboard shortcuts (?)</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <Badge variant="warning" className="gap-1">
-                <FlaskConical className="h-3 w-3" />
-                Prototype
-              </Badge>
-            </div>
-          }
         />
       </div>
 
@@ -206,20 +178,22 @@ export default function OpsReviewCallPage() {
           </Card>
         </div>
 
-        {/* RIGHT — the review */}
-        <div className="flex flex-col gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                What happened on this call?
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Choose the one answer that best fits. If anything you pick needs
-                extra details, a short form will appear below it.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              {/* Outcome — radio list with explanations */}
+        {/* RIGHT — the review (sits on a subtle panel, black left accent) */}
+        <div className="lg:sticky lg:top-4 lg:self-start">
+          <div className="rounded-xl bg-muted/40 p-3">
+            <Card className="flex max-h-[calc(100vh-9rem)] flex-col gap-0 overflow-hidden border-l-4 border-l-foreground py-0">
+              <CardHeader className="shrink-0 pt-6 pb-4">
+                <CardTitle className="text-base">
+                  What happened on this call?
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Choose the one answer that best fits. If anything you pick
+                  needs extra details, a short form will appear below it.
+                </p>
+              </CardHeader>
+              {/* Scrollable list — scrolls behind the pinned footer below */}
+              <div className="flex-1 space-y-5 overflow-y-auto px-6 pb-4">
+                {/* Outcome — radio list with explanations */}
               <div className="space-y-2">
                 <Label>
                   Outcome<span className="text-destructive">*</span>
@@ -369,8 +343,10 @@ export default function OpsReviewCallPage() {
                 </div>
               )}
 
-              {/* Submit stacked over cancel */}
-              <div className="space-y-2">
+              </div>
+
+              {/* Pinned footer — the list scrolls behind this */}
+              <div className="shrink-0 space-y-2 border-t bg-card px-6 py-4">
                 <Button
                   className="w-full"
                   disabled={!outcome || !captureComplete}
@@ -381,9 +357,13 @@ export default function OpsReviewCallPage() {
                 <Button variant="outline" className="w-full" onClick={cancel}>
                   Cancel
                 </Button>
+                <p className="pt-1 text-center text-xs text-muted-foreground">
+                  Keyboard shortcuts: 1–9 pick an outcome · Enter submits · Esc
+                  cancels
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
