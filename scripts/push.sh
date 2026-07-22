@@ -26,14 +26,11 @@ rm -rf "$APP/triage-prototype" "$APP/ops-review-prototype"
 cp -R "$DASH/triage-prototype" "$APP/"
 cp -R "$DASH/ops-review-prototype" "$APP/"
 
-# The Disagreements flow was folded into the single queue — drop the orphan route.
-rm -rf "$APP/triage-prototype/disagreement"
-rm -f "$APP/triage-prototype/disagreement-mock.ts"
-
 # Static export can't put generateStaticParams in a client page, so the client
 # detail becomes detail-view.tsx and a tiny server page.tsx enumerates the IDs.
 mv "$APP/triage-prototype/[callId]/page.tsx" "$APP/triage-prototype/[callId]/detail-view.tsx"
 mv "$APP/ops-review-prototype/[callId]/page.tsx" "$APP/ops-review-prototype/[callId]/detail-view.tsx"
+mv "$APP/triage-prototype/disagreement/[callId]/page.tsx" "$APP/triage-prototype/disagreement/[callId]/detail-view.tsx"
 
 cat > "$APP/triage-prototype/[callId]/page.tsx" <<'EOF'
 import { TRIAGE_MOCK } from "../mock-data";
@@ -63,9 +60,25 @@ export default function Page() {
 }
 EOF
 
+cat > "$APP/triage-prototype/disagreement/[callId]/page.tsx" <<'EOF'
+import { DISAGREEMENT_MOCK } from "../../disagreement-mock";
+import DetailView from "./detail-view";
+
+// Static export needs the full set of disagreement pages known at build time.
+export function generateStaticParams() {
+  return DISAGREEMENT_MOCK.map((r) => ({ callId: r.call_id }));
+}
+
+export default function Page() {
+  return <DetailView />;
+}
+EOF
+
 # These render as the real pages in the shareable shell — drop "(prototype)".
 perl -pi -e 's/Triage \(prototype\)/Triage/g' \
-  "$APP/triage-prototype/page.tsx" "$APP/triage-prototype/[callId]/detail-view.tsx"
+  "$APP/triage-prototype/page.tsx" \
+  "$APP/triage-prototype/[callId]/detail-view.tsx" \
+  "$APP/triage-prototype/disagreement/[callId]/detail-view.tsx"
 perl -pi -e 's/Ops Review \(prototype\)/Ops Review/g' \
   "$APP/ops-review-prototype/page.tsx" "$APP/ops-review-prototype/[callId]/detail-view.tsx"
 

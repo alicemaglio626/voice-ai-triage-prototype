@@ -55,24 +55,13 @@ export function opsCaptureFor(id: string): {
 }
 
 // Why the call landed in triage. Ops Escalation = a reviewer flagged it during
-// Ops review. System Escalation = the system couldn't confidently identify the
-// outcome (e.g. classifiers diverged) and kicked it up on its own.
-export const TRIAGE_REASONS = ["Ops Escalation", "System Escalation"] as const;
+// Ops review. System Disagreement = the classifiers disagreed / the system
+// couldn't confidently identify the outcome and kicked it up on its own.
+export const TRIAGE_REASONS = ["Ops Escalation", "System Disagreement"] as const;
 export type TriageReason = (typeof TRIAGE_REASONS)[number];
 
 export function reasonFor(id: string): TriageReason {
-  return hash(id) % 3 === 0 ? "System Escalation" : "Ops Escalation";
-}
-
-// A distinct soft fill per reason so the two read apart at a glance (same
-// muted-fill treatment as the `warning` badge variant).
-export function reasonBadgeClass(reason: TriageReason): string {
-  switch (reason) {
-    case "Ops Escalation":
-      return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
-    case "System Escalation":
-      return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-  }
+  return hash(id) % 3 === 0 ? "System Disagreement" : "Ops Escalation";
 }
 
 export function callTypeFor(id: string): CallType {

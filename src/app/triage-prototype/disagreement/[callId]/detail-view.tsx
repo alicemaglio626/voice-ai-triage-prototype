@@ -1,48 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/shared/page-header";
+import { CopyIdButton } from "@/components/shared/copy-id-button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { AlertTriangle, CheckCircle, Volume2, X } from "lucide-react";
-import { TRIAGE_MOCK } from "../mock-data";
-import { deriveTheme, deriveWhoEnded, workItemTypeBadgeVariant } from "../bucketing";
 import {
-  callTypeFor,
-  mockTranscript,
-  mockMachineOpinions,
-  reasonFor,
-  opsCaptureFor,
-} from "../detail-mock";
-import { AddWorkItemDialog, type LinkedWorkItem } from "../add-work-item-dialog";
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle,
+  ChevronDown,
+  Volume2,
+  X,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TRIAGE_MOCK } from "../../mock-data";
+import {
+  deriveTheme,
+  deriveWhoEnded,
+  workItemTypeBadgeVariant,
+} from "../../bucketing";
+import { mockTranscript, mockMachineOpinions } from "../../detail-mock";
+import { disagreementFor } from "../../disagreement-mock";
+import { AddWorkItemDialog, type LinkedWorkItem } from "../../add-work-item-dialog";
 
-const DISPOSITIONS = [
-  "On Track",
-  "Scheduled",
-  "Left Voicemail",
-  "Member Not Verified",
-  "Provider Requested Payment",
-  "Human Hung Up",
-  "No Answer",
-];
+const LIST = "/triage-prototype?tab=disagreements";
 
-export default function CallDetailPage() {
+export default function DisagreementDetailPage() {
   const params = useParams<{ callId: string }>();
+  const router = useRouter();
   const item = TRIAGE_MOCK.find((i) => i.call_id === params.callId);
+  const row = disagreementFor(params.callId);
+
   const [workItems, setWorkItems] = useState<LinkedWorkItem[]>([]);
-  const [disposition, setDisposition] = useState<string>();
+  const [showDetails, setShowDetails] = useState(false);
 
   const addItems = (items: LinkedWorkItem[]) =>
     setWorkItems((prev) => {
@@ -52,43 +47,51 @@ export default function CallDetailPage() {
   const removeItem = (t: string) =>
     setWorkItems((prev) => prev.filter((w) => w.title !== t));
 
-  if (!item) {
+  if (!item || !row) {
     return (
       <EmptyState
         icon={AlertTriangle}
-        title="Call not found"
-        description="This call isn't in the prototype sample."
-        action={{ label: "Back to Triage", href: "/triage-prototype" }}
+        title="Disagreement not found"
+        description="This call isn't in the prototype disagreement sample."
+        action={{ label: "Back to Disagreements", href: LIST }}
       />
     );
   }
 
   const { theme } = deriveTheme(item.note);
   const whoEnded = deriveWhoEnded(item.note);
-  const callType = callTypeFor(item.call_id);
-  const reason = reasonFor(item.call_id);
-  const { aiMistake, frustrated } = opsCaptureFor(item.call_id);
   const transcript = mockTranscript(item.note, theme, whoEnded);
   const opinions = mockMachineOpinions(theme);
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        breadcrumbs={[
-          { label: "Triage", href: "/triage-prototype" },
-          { label: `Call ${item.call_id}` },
-        ]}
-      />
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => router.push(LIST)}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <PageHeader
+          title="Review disagreement"
+          breadcrumbs={[
+            { label: "Triage", href: "/triage-prototype" },
+            { label: "Disagreements", href: LIST },
+            { label: "Review disagreement" },
+          ]}
+        />
+      </div>
+
+      <div className="-mt-3 flex items-center gap-1 pl-14 text-xs text-muted-foreground">
+        <span className="font-mono">{row.phone}</span>
+        <CopyIdButton value={row.phone} label="phone number" />
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* LEFT — recording + transcript */}
+        {/* LEFT — call data (blind) */}
         <div className="flex flex-col gap-4 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Call data</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Transcript &amp; recording — the &ldquo;why&rdquo; behind the
-                call.
+                Judge the call from the data alone — no machine guess is shown.
               </p>
             </CardHeader>
             <CardContent>
@@ -136,108 +139,73 @@ export default function CallDetailPage() {
           </Card>
         </div>
 
-        {/* RIGHT — escalation, machine opinions, work items */}
+        {/* RIGHT — machine opinions + triage affordances */}
         <div className="flex flex-col gap-4">
+          {/* Machine opinions — the disagreement itself (non-blind) */}
           <Card>
-            <CardHeader className="gap-0">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="font-normal">
-                  {reason}
-                </Badge>
-                <span className="text-sm text-muted-foreground">{callType}</span>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {reason === "Ops Escalation" ? (
-                <>
-                  <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground">
-                      Jessica made a mistake
-                    </div>
-                    {aiMistake ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="warning">Yes</Badge>
-                        <span>{aiMistake}</span>
-                      </div>
-                    ) : (
-                      <Badge variant="outline">No</Badge>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground">
-                      Provider got frustrated
-                    </div>
-                    {frustrated ? (
-                      <Badge variant={frustrated === "Yes" ? "warning" : "outline"}>
-                        {frustrated}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">Not captured</span>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <p className="text-muted-foreground">
-                  The system couldn&rsquo;t confidently identify the outcome for
-                  this call.
-                </p>
-              )}
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground">
-                  {reason === "Ops Escalation" ? "Reviewer note" : "Details"}
-                </div>
-                <div className="rounded-md border p-3 text-muted-foreground">
-                  {item.note}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Delivered classification — the auto result, changeable at triage */}
-          <Card className="ring-2 ring-[#7c8cef]/60">
             <CardHeader>
-              <CardTitle className="text-base">Delivered classification</CardTitle>
+              <CardTitle className="text-base">Machine opinions</CardTitle>
               <p className="text-sm text-muted-foreground">
-                The auto result delivered for this call. Change it if triage
-                finds the delivered outcome was wrong.
+                The judge and structured classifiers for this run, shown against
+                the human resolution. Non-blind by design — for triage, not
+                review.
               </p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 rounded-md border p-2">
-                <Badge variant="outline">Delivered</Badge>
-                <span className="text-sm">{opinions.delivered}</span>
+            <CardContent className="space-y-2">
+              <div className="flex items-center gap-2 rounded-md border border-datavant-teal/40 bg-datavant-teal/5 p-2.5">
+                <span className="text-sm text-muted-foreground">
+                  Human outcome
+                </span>
+                <Badge className="ml-auto">{row.humanOutcome}</Badge>
               </div>
-              <div className="space-y-1.5">
-                <Label>Set outcome</Label>
-                <Select
-                  value={disposition}
-                  onValueChange={(v) => {
-                    setDisposition(v);
-                    toast.success(`Outcome set to “${v}”`);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Keep delivered outcome" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DISPOSITIONS.map((d) => (
-                      <SelectItem key={d} value={d}>
-                        {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {disposition && disposition !== opinions.delivered && (
-                  <p className="text-xs text-muted-foreground">
-                    Overrides delivered &ldquo;{opinions.delivered}&rdquo; — the
-                    call record updates on resolve.
-                  </p>
-                )}
+              <div className="flex items-center gap-2 rounded-md border p-2.5">
+                <span className="text-sm text-muted-foreground">Judge</span>
+                <Badge className="ml-auto">{row.judge}</Badge>
+                <Badge variant="outline" className="capitalize">
+                  {row.judgeConfidence}
+                </Badge>
               </div>
+              <div className="flex items-center gap-2 rounded-md border p-2.5">
+                <span className="text-sm text-muted-foreground">Structured</span>
+                <Badge className="ml-auto">{row.structured}</Badge>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full justify-center gap-1 font-normal"
+                onClick={() => setShowDetails((s) => !s)}
+              >
+                {showDetails ? "Hide details" : "Show details"}
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    showDetails && "rotate-180",
+                  )}
+                />
+              </Button>
+              {showDetails && (
+                <div className="space-y-1.5 rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Delivered outcome</span>
+                    <span className="font-medium text-foreground">
+                      {opinions.delivered}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Judge confidence</span>
+                    <span className="font-medium capitalize text-foreground">
+                      {row.judgeConfidence}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Classifiers agree?</span>
+                    <span className="font-medium text-foreground">No</span>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Work items → resolve — one connected flow */}
+          {/* Work items — same affordance as the triage detail */}
           <Card className="ring-2 ring-[#7c8cef]/60">
             <CardHeader>
               <CardTitle className="text-base">Work items</CardTitle>
@@ -291,7 +259,7 @@ export default function CallDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Resolve — terminal action for either/both edits above */}
+          {/* Resolve — terminal action */}
           <div className="pt-1">
             <Button
               variant="outline"
@@ -302,9 +270,8 @@ export default function CallDetailPage() {
               Mark resolved
             </Button>
             <p className="mt-1.5 text-center text-xs text-muted-foreground">
-              Resolving closes this triage entry — resolve once you&rsquo;ve set
-              the disposition and/or added any work items (or if nothing&rsquo;s
-              actionable).
+              Resolving closes this disagreement — the delivered result is never
+              re-touched.
             </p>
           </div>
         </div>
